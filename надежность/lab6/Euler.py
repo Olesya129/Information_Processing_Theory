@@ -9,30 +9,33 @@ def system(t, P):
     dP2dt = 0.5 * P0 + 1 * P4 - 6 * P2
     dP3dt = 2 * P1 - 1 * P3
     dP4dt = 2 * P2 - 1 * P4
-    return np.array([dP0dt, dP1dt, dP2dt, dP3dt, dP4dt], dtype=np.float64)
+    return np.array([dP0dt, dP1dt, dP2dt, dP3dt, dP4dt], dtype=np.float64)  # выход: массив производных
 
-# Метод Эйлера
+# Метод Эйлера - решение диф. уравнений. Приближенное значение функции
 def euler_method(func, t0, P0, t_end, dt):
-    t_values = np.arange(t0, t_end, dt)
-    P_values = []
-    P = np.array(P0, dtype=np.float64)  # Явно указываем тип float64
+    t_values = np.arange(t0, t_end, dt)     # Массив времени [0, 0.01, 0.02, ..., 10]
+    P_values = []                           # Здесь будем хранить все P(t)
+    P = np.array(P0, dtype=np.float64)      # Начальные условия [1.0, 0.0, 0.0, 0.0, 0.0]
+
     for t in t_values:
-        P_values.append(P.copy())
-        P += dt * func(t, P)  # Обновляем P по методу Эйлера
-        # Выводим значения переменных для текущего шага
+        P_values.append(P.copy())   # Сохраняем текущее состояние
+        dP = func(t, P)             # Вычисляем производные (dP0/dt, dP1/dt, ...)
+        P += dt * dP                # Обновляем P по методу Эйлера
+
+        # Вывод текущих значений
         print(f"t = {t:.2f} : P0 = {P[0]:.6f}, P1 = {P[1]:.6f}, P2 = {P[2]:.6f}, P3 = {P[3]:.6f}, P4 = {P[4]:.6f}")
+
     return np.array(P_values), t_values
 
 # Начальные условия (теперь явно float)
-P0_initial = [1.0, 0.0, 0.0, 0.0, 0.0]  # P0(0) = 1.0 (float), остальные 0.0
-t0 = 0.0    # Начальное время (float)
-t_end = 10.0  # Конечное время (float)
-dt = 0.01   # Шаг по времени
+P0_initial = [1.0, 0.0, 0.0, 0.0, 0.0]          # P0(0) = 1.0, остальные 0.0
+t0 = 0.0        # Начальное время (float)
+t_end = 10.0    # Конечное время (float)
+dt = 0.3       # Шаг по времени
 
 # Решаем систему методом Эйлера
 P_values, t_values = euler_method(system, t0, P0_initial, t_end, dt)
 
-# Визуализация результатов
 plt.figure(figsize=(10, 6))
 plt.plot(t_values, P_values[:, 0], label='P0(t)')
 plt.plot(t_values, P_values[:, 1], label='P1(t)')
